@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Chess Game</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css"/>
+
+<link rel="stylesheet" href="style.css"/>
+
+</head>
+
+<body>
+
+<h1>♟ Chess Game</h1>
+
+<div id="board"></div>
+
+<div class="controls">
+    <button onclick="resetGame()">Reset Game</button>
+</div>
+
+<div id="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+
+<script>
+let game = new Chess();
+
+let board = Chessboard('board', {
+    draggable: true,
+    position: 'start',
+
+    onDragStart: function (source, piece) {
+        if (game.game_over()) return false;
+
+        if ((game.turn() === 'w' && piece.startsWith('b')) ||
+            (game.turn() === 'b' && piece.startsWith('w'))) {
+            return false;
+        }
+    },
+
+    onDrop: function (source, target) {
+        let move = game.move({
+            from: source,
+            to: target,
+            promotion: 'q'
+        });
+
+        if (move === null) return 'snapback';
+
+        updateStatus();
+
+        setTimeout(makeRandomBotMove, 500);
+    },
+
+    onSnapEnd: function () {
+        board.position(game.fen());
+    }
+});
+
+function makeRandomBotMove() {
+    if (game.game_over()) return;
+
+    let moves = game.moves();
+    let randomMove = moves[Math.floor(Math.random() * moves.length)];
+
+    game.move(randomMove);
+
+    board.position(game.fen());
+
+    updateStatus();
+}
+
+function updateStatus() {
+    let status = "";
+
+    if (game.in_checkmate()) {
+        status = "Checkmate!";
+    } else if (game.in_draw()) {
+        status = "Draw!";
+    } else {
+        status = (game.turn() === 'w' ? "White" : "Black") + " to move";
+
+        if (game.in_check()) status += " (Check!)";
+    }
+
+    document.getElementById("status").innerText = status;
+}
+
+function resetGame() {
+    game.reset();
+    board.start();
+    updateStatus();
+}
+
+updateStatus();
+</script>
+
+</body>
+</html>
