@@ -1,2 +1,3 @@
-# checkmate
-A modern chess web application with a simple random AI opponent.
+♟️ Chess Web App
+
+A modern, browser-based chess game with a simple random AI opponent. Built using HTML, CSS, and JavaScript.
